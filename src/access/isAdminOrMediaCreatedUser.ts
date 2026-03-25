@@ -12,7 +12,7 @@ export const isAdminOrMediaCreatedUser: Access = ({ req: { user } }) => {
     return {
       useremail: {
         equals: user.email,
-      }
+      },
     }
   }
 

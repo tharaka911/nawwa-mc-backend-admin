@@ -23,9 +23,9 @@ export const Users: CollectionConfig = {
     update: isAdminOrSelf,
     delete: isAdmin,
 
-    // only allow admins to access admin panel
+    // allow admins and riders to access admin panel
     admin: ({ req: { user } }) => {
-      return !!(user && Array.isArray(user.roles) && user.roles.includes('admin'));
+      return !!(user && Array.isArray(user.roles) && (user.roles.includes('admin') || user.roles.includes('rider')));
     },
   },
   hooks: {

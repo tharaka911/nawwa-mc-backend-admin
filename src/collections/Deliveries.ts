@@ -17,6 +17,14 @@ export const Deliveries: CollectionConfig = {
   },
   fields: [
     {
+      name: 'riderEmail',
+      type: 'text',
+      label: 'Rider Email',
+      admin: {
+        readOnly: true,
+      },
+    },
+    {
       name: 'deliveryStatus',
       label: 'Delivery Status',
       type: 'select',

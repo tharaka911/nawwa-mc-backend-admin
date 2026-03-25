@@ -2,19 +2,20 @@ import { Access } from 'payload'
 
 export const isAdminOrRider: Access = ({ req: { user } }) => {
   // Need to be logged in
-  if (user) {
-    // If user has role of 'admin'
-    if (user.roles?.includes('admin')) {
-      return true
-    }
+  if (!user) return false
 
-    {
-      if (user.roles?.includes('rider')) {
-        return true
-      }
+  // If user has role of 'admin'
+  if (user.roles?.includes('admin')) {
+    return true
+  }
+
+  // If user has role of 'rider'
+  if (user.roles?.includes('rider')) {
+    return {
+      riderEmail: {
+        equals: user.email,
+      },
     }
-      
-    
   }
 
   // Reject everyone else
