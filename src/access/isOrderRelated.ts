@@ -15,8 +15,8 @@ export const isOrderRelated: Access = ({ req: { user } }) => {
         },
       },
       {
-        riderEmail: {
-          equals: user.email,
+        assignedRider: {
+          equals: user.id,
         },
       },
     ],

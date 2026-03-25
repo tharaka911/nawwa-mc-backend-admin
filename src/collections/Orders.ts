@@ -38,15 +38,21 @@ export const Orders: CollectionConfig = {
     },
 
     {
-      name: 'riderEmail',
-      type: 'text',
-      label: 'Rider Email',
+      name: 'assignedRider',
+      type: 'relationship',
+      relationTo: 'users',
+      label: 'Assigned Rider',
       admin: {
         description: 'Assign a rider for this order',
       },
-      validate: (val: string | string[] | null | undefined, { data }: { data: any }) => {
+      filterOptions: {
+        roles: {
+          contains: 'rider',
+        },
+      },
+      validate: (val: any, { data }: { data: any }) => {
         if (data?.orderStatus === 'approved for delivery' && !val) {
-          return 'Rider email is required when order is approved for delivery'
+          return 'Rider is required when order is approved for delivery'
         }
         return true
       },
@@ -156,9 +162,21 @@ export const Orders: CollectionConfig = {
       async ({ doc, req, previousDoc }) => {
         const isApproved = doc.orderStatus === 'approved for delivery'
         const wasApproved = previousDoc?.orderStatus === 'approved for delivery'
-        const riderChanged = doc.riderEmail !== previousDoc?.riderEmail
+        const riderChanged = doc.assignedRider !== previousDoc?.assignedRider
 
         if (isApproved && (!wasApproved || riderChanged)) {
+          // Fetch the rider's email if assigned
+          let riderEmail = ''
+          if (doc.assignedRider) {
+            const riderId =
+              typeof doc.assignedRider === 'string' ? doc.assignedRider : doc.assignedRider.id
+            const riderUser = await req.payload.findByID({
+              collection: 'users',
+              id: riderId,
+            })
+            riderEmail = riderUser?.email || ''
+          }
+
           // Check if a delivery already exists for this order
           const existingDeliveries = await req.payload.find({
             collection: 'deliveries',
@@ -178,7 +196,7 @@ export const Orders: CollectionConfig = {
             phone: doc.phone,
             location: doc.location,
             orderedPersonEmail: doc.useremail,
-            riderEmail: doc.riderEmail,
+            riderEmail: riderEmail,
             orderId: doc.id,
           }
 
