@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+.DS_Store
+*.log
+docker-compose.yml
+Dockerfile
+.dockerignore
+.vercel
+/public
+/storage
