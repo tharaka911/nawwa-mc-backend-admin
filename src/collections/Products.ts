@@ -10,7 +10,7 @@ export const Products: CollectionConfig = {
   },
   access: {
     create: isAdmin,
-    read: isLoggedIn,
+    read: () => true,
     update: isAdmin,
     delete: isAdmin,
   },

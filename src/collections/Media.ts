@@ -6,7 +6,7 @@ export const Media: CollectionConfig = {
   slug: 'media',
   access: {
     create: isLoggedIn,
-    read: isLoggedIn,
+    read: () => true,
     update: isLoggedIn,
     delete: isLoggedIn,
   },
