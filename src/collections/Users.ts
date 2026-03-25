@@ -1,7 +1,8 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, PayloadRequest } from 'payload'
 import { isAdminOrSelf } from '../access/isAdminOrSelf'
 import { isAdmin, isAdminFieldLevel } from '../access/isAdmin'
 import { isAdminCreate } from '../access/isAdminCreates'
+import crypto from 'crypto'
 
 
 export const Users: CollectionConfig = {
@@ -26,6 +27,22 @@ export const Users: CollectionConfig = {
     admin: ({ req: { user } }) => {
       return !!(user && Array.isArray(user.roles) && user.roles.includes('admin'));
     },
+  },
+  hooks: {
+    afterLogin: [
+      async ({ user, req }: { user: any; req: PayloadRequest }) => {
+        if (!user.apiKey) {
+          const apiKey = crypto.randomBytes(24).toString('hex')
+          await req.payload.update({
+            collection: 'users',
+            id: user.id,
+            data: {
+              apiKey,
+            },
+          })
+        }
+      },
+    ],
   },
 
   fields: [
