@@ -23,7 +23,7 @@ const dirname = path.dirname(filename)
 
 export default buildConfig({
   email: resendAdapter({
-    defaultFromAddress: 'admin@noreply.nawwa.xyz',
+    defaultFromAddress: 'admin@noreply.macna.app',
     defaultFromName: 'admin',
     apiKey: process.env.RESEND_API_KEY || '',
   }),
@@ -33,7 +33,7 @@ export default buildConfig({
 
     components: {
       graphics: {
-        Logo: '../src/app/(payload)/graphics/Logo.tsx',
+        Logo: '@/app/(payload)/graphics/Logo.tsx',
       },  
     },
   },
