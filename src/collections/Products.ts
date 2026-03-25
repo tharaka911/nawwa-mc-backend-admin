@@ -7,6 +7,7 @@ export const Products: CollectionConfig = {
   slug: 'products',
   admin: {
     useAsTitle: 'name',
+    hidden: ({ user }) => !user?.roles?.includes('admin'),
   },
   access: {
     create: isAdmin,

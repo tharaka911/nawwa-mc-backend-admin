@@ -6,6 +6,7 @@ export const Notifications: CollectionConfig = {
   slug: 'notifications',
   admin: {
     useAsTitle: 'messageTitle',
+    hidden: ({ user }) => !user?.roles?.includes('admin'),
   },
    access: {
       //amyone can create an account

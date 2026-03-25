@@ -4,6 +4,9 @@ import { isLoggedIn } from '@/access/isLoggedIn'
 
 export const Media: CollectionConfig = {
   slug: 'media',
+  admin: {
+    hidden: ({ user }) => !user?.roles?.includes('admin'),
+  },
   access: {
     create: isLoggedIn,
     read: () => true,

@@ -9,6 +9,7 @@ export const Users: CollectionConfig = {
   slug: 'users',
   admin: {
     useAsTitle: 'email',
+    hidden: ({ user }) => !user?.roles?.includes('admin'),
   },
   auth: {
     // verify: true,

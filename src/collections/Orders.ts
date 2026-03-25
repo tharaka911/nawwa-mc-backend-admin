@@ -8,6 +8,7 @@ export const Orders: CollectionConfig = {
   slug: 'orders',
   admin: {
     useAsTitle: 'useremail',
+    hidden: ({ user }) => !user?.roles?.includes('admin'),
   },
   access: {
     create: isAdminOrCustomer,

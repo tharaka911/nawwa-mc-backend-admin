@@ -6,6 +6,7 @@ export const Categories: CollectionConfig = {
   slug: 'categories',
   admin: {
     useAsTitle: 'name',
+    hidden: ({ user }) => !user?.roles?.includes('admin'),
   },
   access: {
     create: isAdmin,

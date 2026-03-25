@@ -6,6 +6,7 @@ export const Carts: CollectionConfig = {
   slug: 'carts',
   admin: {
     useAsTitle: 'useremail',
+    hidden: ({ user }) => !user?.roles?.includes('admin'),
   },
   access: {
     create: isAdminOrCustomer,

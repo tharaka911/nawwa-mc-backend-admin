@@ -4,6 +4,7 @@ export const Cars: CollectionConfig = {
   slug: 'cars',
   admin: {
     useAsTitle: 'name',
+    hidden: ({ user }) => !user?.roles?.includes('admin'),
   },
   access: {
     // Make all operations openly accessible
