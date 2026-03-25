@@ -5,14 +5,14 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
-    "dev": "cross-env NODE_OPTIONS='--inspect' next dev",
-    "devsafe": "rm -rf .next && cross-env NODE_OPTIONS=--no-deprecation next dev",
-    "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
-    "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
-    "lint": "cross-env NODE_OPTIONS=--no-deprecation next lint",
-    "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
-    "start": "cross-env NODE_OPTIONS=--no-deprecation next start"
+    "build": "cross-env NODE_OPTIONS='--no-deprecation --max-old-space-size=4096' next build",
+    "dev": "cross-env NODE_OPTIONS='--inspect --max-old-space-size=4096' next dev",
+    "devsafe": "rm -rf .next && cross-env NODE_OPTIONS='--no-deprecation --max-old-space-size=4096' next dev",
+    "generate:importmap": "cross-env NODE_OPTIONS='--no-deprecation --max-old-space-size=4096' payload generate:importmap",
+    "generate:types": "cross-env NODE_OPTIONS='--no-deprecation --max-old-space-size=4096' payload generate:types",
+    "lint": "cross-env NODE_OPTIONS='--no-deprecation --max-old-space-size=4096' next lint",
+    "payload": "cross-env NODE_OPTIONS='--no-deprecation --max-old-space-size=4096' payload",
+    "start": "cross-env NODE_OPTIONS='--no-deprecation --max-old-space-size=4096' next start"
   },
   "dependencies": {
     "@payloadcms/db-mongodb": "latest",
