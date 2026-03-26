@@ -1,22 +1,23 @@
 import { Access } from 'payload'
 
 export const isAdminOrSelf: Access = ({ req: { user } }) => {
-  // Need to be logged in
   if (user) {
-    // If user has role of 'admin'
-    if (user.roles?.includes('admin')) {
+    // Admin role has full access to all users
+    const roles = Array.isArray(user.roles) ? user.roles : []
+    if (roles.includes('admin')) {
       return true
     }
 
-    
-      return {
-        id: {
-          equals: user.id,
-        },
-      }
-    
+    // Individual users can only read their own document
+    if (user.id) {
+       return {
+         id: {
+           equals: user.id,
+         },
+       }
+    }
   }
 
-  // Reject everyone else
+  // Everyone else (including logged-out users) is rejected
   return false
 }

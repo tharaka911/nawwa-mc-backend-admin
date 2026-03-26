@@ -122,5 +122,28 @@ export const Users: CollectionConfig = {
       relationTo: 'media',
       defaultValue: '67c1babd9f41846dd16b48c8',
     },
+    // Explicitly hide apiKey from regular users
+    {
+      name: 'apiKey',
+      type: 'text',
+      access: {
+        read: ({ req: { user }, doc }) => {
+          if (user?.roles?.includes('admin')) return true
+          if (user?.id === doc?.id) return true
+          return false
+        },
+      },
+    },
+    {
+      name: 'enableAPIKey',
+      type: 'checkbox',
+      access: {
+        read: ({ req: { user }, doc }) => {
+          if (user?.roles?.includes('admin')) return true
+          if (user?.id === doc?.id) return true
+          return false
+        },
+      },
+    },
   ],
 }
