@@ -7,6 +7,7 @@ import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
+import { openapi, scalar } from 'payload-oapi'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
@@ -62,6 +63,17 @@ export default buildConfig({
         },
         region: process.env.S3_REGION || '',
       },
+    }),
+    openapi({
+       openapiVersion: '3.1',
+       metadata: {
+         title: 'Nawwa MECOM API',
+         version: '1.0.0',
+       },
+    }),
+    scalar({
+       docsUrl: '/docs',
+       specEndpoint: '/openapi.json',
     }),
   ],
   // cors: "*",
