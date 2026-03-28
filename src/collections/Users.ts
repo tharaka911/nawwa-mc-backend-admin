@@ -12,7 +12,7 @@ export const Users: CollectionConfig = {
     hidden: ({ user }) => !user?.roles?.includes('admin'),
   },
   auth: {
-    verify: true,
+    // verify: true,
     useAPIKey: true,
     // Allow users without passwords (for Google OAuth)
     // disableLocalStrategy: true,
