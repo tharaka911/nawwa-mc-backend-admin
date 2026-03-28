@@ -66,10 +66,11 @@ export default buildConfig({
     }),
     openapi({
        openapiVersion: '3.1',
-       metadata: {
-         title: 'Nawwa MECOM API',
-         version: '1.0.0',
-       },
+        metadata: {
+          title: 'Nawwa MECOM API',
+          version: '1.0.0',
+          description: 'To authenticate requests, add the following header: `Authorization: users API-Key YOUR_API_KEY_HERE`. You can find your API Key in your user profile in the Admin Panel.',
+        },
     }),
     scalar({
        docsUrl: '/docs',

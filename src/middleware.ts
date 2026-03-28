@@ -6,7 +6,12 @@ export function middleware(request: NextRequest) {
   const { pathname, search } = nextUrl
 
   // Log the request to terminal
-  console.log(`[REQUEST] ${new Date().toISOString()} ${method} ${pathname}${search}`)
+  const nextAction = request.headers.get('next-action')
+  if (nextAction) {
+    console.log(`[SERVER ACTION] ${new Date().toISOString()} ID: ${nextAction} ${method} ${pathname}${search}`)
+  } else {
+    console.log(`[REQUEST] ${new Date().toISOString()} ${method} ${pathname}${search}`)
+  }
 
   return NextResponse.next()
 }
