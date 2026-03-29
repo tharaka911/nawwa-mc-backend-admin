@@ -20,9 +20,11 @@ const VerifyEmailContent = () => {
 
     const verifyToken = async () => {
       try {
-        console.log('Verifying token:', token);
         const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || window.location.origin;
-        const response = await fetch(`${baseUrl}/api/users/verify/${encodeURIComponent(token || '')}`, {
+        const fetchUrl = `${baseUrl}/api/users/verify?token=${encodeURIComponent(token || '')}`;
+        console.log('Fetching verification URL:', fetchUrl);
+
+        const response = await fetch(fetchUrl, {
           method: 'GET',
           credentials: 'include',
         })
@@ -32,12 +34,12 @@ const VerifyEmailContent = () => {
           setMessage('Your email has been verified successfully!')
         } else {
           const data = await response.json()
-          console.error('Verification error response:', data);
+          console.error('API Error Response:', data);
           setStatus('error')
           setMessage(data.errors?.[0]?.message || 'Verification failed. The link may have expired.')
         }
       } catch (err) {
-        console.error('Catch error:', err);
+        console.error('Fetch error:', err);
         setStatus('error')
         setMessage('An unexpected error occurred. Please try again later.')
       }
