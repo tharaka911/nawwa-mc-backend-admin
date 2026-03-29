@@ -8,7 +8,7 @@ import { Access } from 'payload'
  * - Others: Denied (return false)
  */
 export const isOwner: Access = ({ req: { user }, id }) => {
-  // 1. Admins have full access to all documents
+  // 1. Admins have full access
   if (user && Array.isArray(user.roles) && user.roles.includes('admin')) {
     return true
   }

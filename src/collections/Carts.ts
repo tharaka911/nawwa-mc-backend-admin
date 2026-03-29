@@ -10,9 +10,17 @@ export const Carts: CollectionConfig = {
   },
   access: {
     create: () => true,
-    read: isOwner,
-    update: isOwner,
-    delete: isOwner,
+    read: isOwner, // isOwner already handles ID-based guest read
+    update: ({ req: { user }, id }) => {
+       if (user?.roles?.includes('admin')) return true
+       if (user?.email) return { useremail: { equals: user.email } }
+       return false
+    },
+    delete: ({ req: { user }, id }) => {
+       if (user?.roles?.includes('admin')) return true
+       if (user?.email) return { useremail: { equals: user.email } }
+       return false
+    },
   },
 
   fields: [
