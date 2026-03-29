@@ -1,5 +1,5 @@
 import type { CollectionConfig, PayloadRequest } from 'payload'
-import { isAdminOrSelf } from '../access/isAdminOrSelf'
+import { isAdminOrSelf, isAdminOrSelfFieldLevel } from '../access/isAdminOrSelf'
 import { isAdmin, isAdminFieldLevel } from '../access/isAdmin'
 import { isAdminCreate } from '../access/isAdminCreates'
 import crypto from 'crypto'
@@ -48,18 +48,19 @@ export const Users: CollectionConfig = {
     },
   },
   hooks: {
-    afterLogin: [
-      async ({ user, req }: { user: any; req: PayloadRequest }) => {
-        if (!user.apiKey) {
-          const apiKey = crypto.randomBytes(24).toString('hex')
-          await req.payload.update({
-            collection: 'users',
-            id: user.id,
-            data: {
-              apiKey,
-            },
-          })
+    beforeChange: [
+      ({ data, operation }) => {
+        if (operation === 'create') {
+          // Automatically enable API Key on creation
+          data.enableAPIKey = true
         }
+        
+        // Ensure apiKey is generated if enabled but missing
+        if (data.enableAPIKey && !data.apiKey) {
+          data.apiKey = crypto.randomBytes(24).toString('hex')
+        }
+        
+        return data
       },
     ],
   },
@@ -140,27 +141,31 @@ export const Users: CollectionConfig = {
       relationTo: 'media',
       defaultValue: '67c1babd9f41846dd16b48c8',
     },
-    // Explicitly hide apiKey from regular users
-    {
-      name: 'apiKey',
-      type: 'text',
-      access: {
-        read: ({ req: { user }, doc }) => {
-          if (user?.roles?.includes('admin')) return true
-          if (user?.id === doc?.id) return true
-          return false
-        },
-      },
-    },
+    
+    // API Key Fields (Handled by Payload auth, but customized here)
     {
       name: 'enableAPIKey',
       type: 'checkbox',
+      label: 'Enable API Key',
+      defaultValue: true, // This ensures new users have it checked
+      admin: {
+        position: 'sidebar',
+      },
       access: {
-        read: ({ req: { user }, doc }) => {
-          if (user?.roles?.includes('admin')) return true
-          if (user?.id === doc?.id) return true
-          return false
-        },
+        read: isAdminOrSelfFieldLevel,
+        update: isAdminFieldLevel, // Only admins can disable API access
+      },
+    },
+    {
+      name: 'apiKey',
+      type: 'text',
+      label: 'API Key',
+      admin: {
+        position: 'sidebar',
+      },
+      access: {
+        read: isAdminOrSelfFieldLevel, 
+        update: isAdminFieldLevel, // Only admins can manually change the key
       },
     },
   ],
