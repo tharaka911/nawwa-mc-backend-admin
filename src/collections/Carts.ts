@@ -1,7 +1,6 @@
 import type { CollectionConfig } from 'payload'
-import { isOwner } from '../access/isOwner'
-import { isAdminOrMediaCreatedUser } from '../access/isAdminOrMediaCreatedUser'
-import { isAdminOrCustomer } from '../access/isAdminOrCustomer'
+import { isAdminOrSelf } from '../access/isAdminOrSelf'
+import { isAdmin } from '../access/isAdmin'
 
 export const Carts: CollectionConfig = {
   slug: 'carts',
@@ -11,9 +10,10 @@ export const Carts: CollectionConfig = {
   },
   access: {
     create: () => true,
-    read: isAdminOrMediaCreatedUser,
-    update: isAdminOrMediaCreatedUser,
-    delete: isAdminOrMediaCreatedUser,
+    read: isAdminOrSelf,
+    update: isAdminOrSelf,
+    delete: isAdmin,
+
   },
 
   fields: [
