@@ -77,6 +77,7 @@ export default buildConfig({
        specEndpoint: '/openapi.json',
     }),
   ],
-  // cors: "*",
-  // csrf: process.env.CSRF_URLS ? process.env.CSRF_URLS.split(",") : [],
+  serverURL: process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000',
+  cors: [process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'].filter(Boolean),
+  csrf: [process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'].filter(Boolean),
 })
