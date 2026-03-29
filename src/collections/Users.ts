@@ -48,20 +48,25 @@ export const Users: CollectionConfig = {
     },
   },
   hooks: {
-    beforeChange: [
-      ({ data, operation }) => {
+    afterChange: [
+      async ({ doc, operation }) => {
+        // Trigger Payload's native API key generation logic after user creation
         if (operation === 'create') {
-          // 1. Automatically enable API Key on creation
-          data.enableAPIKey = true
+          try {
+            const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
+            await fetch(`${serverUrl}/api/users/${doc.id}/api-key`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `users API-Key ${process.env.SUPER_ADMIN_API_KEY}`,
+              },
+            })
+            console.log(`Successfully generated Payload-native API Key for user: ${doc.id}`)
+          } catch (error) {
+            console.error('Failed to auto-generate API key in hook:', error)
+          }
         }
-
-        // 3. Use standard UUID format for the API Key (Payload-native format)
-        if (data.enableAPIKey && !data.apiKey) {
-          data.apiKey = crypto.randomUUID()
-        }
-
-        return data
-      },
+      }
     ],
   },
 
