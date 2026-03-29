@@ -221,13 +221,98 @@ export const Orders: CollectionConfig = {
             })
           }
 
-          // Send email if it's a new approval
+          // Send refined HTML email if it's a new approval
           if (!wasApproved) {
-            await req.payload.sendEmail({
-              to: doc.useremail,
-              subject: 'Admin Approved your order for delivery',
-              text: `Your order has been approved for delivery. Your order ID is ${doc.id}`,
-            })
+            try {
+              // 1. Fetch full product details for the email
+              const productSummary = await Promise.all(
+                (doc.products || []).map(async (item: any) => {
+                  try {
+                    const productId = typeof item.product === 'object' ? item.product.id : item.product
+                    const product = await req.payload.findByID({
+                      collection: 'products',
+                      id: productId,
+                    })
+                    return {
+                      name: product.name || 'Untitled Product',
+                      quantity: item.quantity || 0,
+                      price: product.price || 0,
+                    }
+                  } catch (e) {
+                    return { name: 'Unknown Product', quantity: item.quantity || 0, price: 0 }
+                  }
+                }),
+              )
+
+              // 2. Build rows for the HTML table
+              const productRows = productSummary
+                .map(
+                  (item) => `
+                <tr>
+                  <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name}</td>
+                  <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
+                  <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">Rs. ${Number(
+                    item.price,
+                  ).toLocaleString()}</td>
+                </tr>
+              `,
+                )
+                .join('')
+
+              // 3. Define the professional HTML template
+              const htmlEmail = `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; color: #333;">
+                  <div style="text-align: center; margin-bottom: 20px;">
+                    <h1 style="color: #007bff; margin-bottom: 8px;">Order Approved!</h1>
+                    <p style="font-size: 16px; color: #666;">Your order #${
+                      doc.id
+                    } is now being prepared for delivery.</p>
+                  </div>
+                  
+                  <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 8px;">Order Summary</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                      <thead>
+                        <tr>
+                          <th style="text-align: left; padding: 10px; border-bottom: 2px solid #eee;">Item</th>
+                          <th style="text-align: center; padding: 10px; border-bottom: 2px solid #eee;">Qty</th>
+                          <th style="text-align: right; padding: 10px; border-bottom: 2px solid #eee;">Price</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        ${productRows}
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <td colspan="2" style="padding: 15px 10px 10px; text-align: right; font-weight: bold;">Total Amount:</td>
+                          <td style="padding: 15px 10px 10px; text-align: right; font-weight: bold; color: #007bff; font-size: 18px;">Rs. ${Number(
+                            doc.totalPrice,
+                          ).toLocaleString()}</td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+
+                  <div style="margin-bottom: 20px;">
+                    <h3 style="border-bottom: 2px solid #eee; padding-bottom: 8px;">Delivery Details</h3>
+                    <p style="margin: 8px 0;"><strong>Address:</strong> ${doc.addressLine1}${
+                doc.addressLine2 ? ', ' + doc.addressLine2 : ''
+              }, ${doc.city}</p>
+                    <p style="margin: 8px 0;"><strong>Phone:</strong> ${doc.phone}</p>
+                  </div>
+
+                  <p style="font-size: 14px; color: #666; text-align: center; margin-top: 30px;">Thank you for shopping with Nawwa MC!</p>
+                </div>
+              `
+
+              await req.payload.sendEmail({
+                to: doc.useremail,
+                subject: 'Admin Approved your order for delivery',
+                html: htmlEmail,
+              })
+            } catch (error) {
+              console.error('Error sending order approval email:', error)
+            }
           }
         }
       },

@@ -175,37 +175,98 @@ export const Deliveries: CollectionConfig = {
           })
 
           try {
-            const productDetails = doc.products
+            // 1. Fetch full product details for the email summary
+            const productSummary = await Promise.all(
+              (doc.products || []).map(async (item: any) => {
+                try {
+                  const productId = typeof item.product === 'object' ? item.product.id : item.product
+                  const product = await req.payload.findByID({
+                    collection: 'products',
+                    id: productId,
+                  })
+                  return {
+                    name: product.name || 'Untitled Product',
+                    quantity: item.quantity || 0,
+                    price: product.price || 0,
+                  }
+                } catch (e) {
+                  return { name: 'Unknown Product', quantity: item.quantity || 0, price: 0 }
+                }
+              }),
+            )
+
+            // 2. Build rows for the HTML table
+            const productRows = productSummary
               .map(
-                (product: { product: { name: string }; quantity: number }) =>
-                  `- ${product.product.name} (Quantity: ${product.quantity})`,
+                (item) => `
+              <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name}</td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">Rs. ${Number(
+                  item.price,
+                ).toLocaleString()}</td>
+              </tr>
+            `,
               )
-              .join('\n')
-            const emailContent = `
-            Dear Customer,
+              .join('')
 
-            Your order has been successfully delivered. Here are the details of your order:
+            // 3. Define the professional HTML template
+            const htmlEmail = `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; color: #333;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                  <div style="background: #10b981; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 30px;">✓</div>
+                  <h1 style="color: #10b981; margin-bottom: 8px;">Order Delivered!</h1>
+                  <p style="font-size: 16px; color: #666;">Great news! Your order has been successfully delivered.</p>
+                </div>
+                
+                <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                  <div style="border-bottom: 2px solid #eee; padding-bottom: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="margin: 0;">Delivery Summary</h3>
+                    <span style="color: #666; font-size: 14px;">Order #${doc.orderId}</span>
+                  </div>
+                  <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                      <tr>
+                        <th style="text-align: left; padding: 10px; border-bottom: 2px solid #eee;">Item</th>
+                        <th style="text-align: center; padding: 10px; border-bottom: 2px solid #eee;">Qty</th>
+                        <th style="text-align: right; padding: 10px; border-bottom: 2px solid #eee;">Price</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${productRows}
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colspan="2" style="padding: 15px 10px 10px; text-align: right; font-weight: bold;">Total Paid:</td>
+                        <td style="padding: 15px 10px 10px; text-align: right; font-weight: bold; color: #10b981; font-size: 18px;">Rs. ${Number(
+                          doc.totalPrice,
+                        ).toLocaleString()}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
 
-            Order ID: ${doc.orderId}
-            Delivery ID: ${doc.deleveryId}
-            Total Price: ${doc.totalPrice}
+                <div style="margin-bottom: 20px;">
+                  <h3 style="border-bottom: 2px solid #eee; padding-bottom: 8px;">Delivery Information</h3>
+                  <p style="margin: 8px 0;"><strong>Delivery ID:</strong> ${doc.deleveryId}</p>
+                  <p style="margin: 8px 0;"><strong>Rider Email:</strong> ${doc.riderEmail}</p>
+                  <p style="margin: 8px 0;"><strong>Location:</strong> ${doc.addressLine1}, ${doc.city}</p>
+                </div>
 
-            Products:
-            ${productDetails}
-
-            Thank you for shopping with us!
-
-            Best regards,
-            Nawwa MC.
-          `
+                <div style="text-align: center; padding: 20px; background: #f0fdf4; border-radius: 8px;">
+                  <p style="margin: 0; color: #166534; font-weight: bold;">Thank you for choosing Nawwa MC!</p>
+                  <p style="margin: 5px 0 0; color: #166534; font-size: 14px;">We hope to serve you again soon.</p>
+                </div>
+              </div>
+            `
 
             await req.payload.sendEmail({
               to: doc.orderedPersonEmail,
               subject: 'Your delivery has been delivered',
-              text: emailContent,
+              html: htmlEmail,
             })
           } catch (error) {
-            console.error('Error sending email:', error)
+            console.error('Error sending delivery success email:', error)
           }
 
           // // Update the emailSent field in the delivery document
