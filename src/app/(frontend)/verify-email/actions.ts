@@ -33,15 +33,18 @@ export const verifyEmailAction = async (token: string) => {
     }
   } catch (err: any) {
     console.error('Verification Action Error:', err.message)
+    const errorMessage = err.message || ''
     
-    // Check for specific Payload error messages
-    const errorMessage = err.message || 'An error occurred during verification.'
-    
+    if (errorMessage.toLowerCase().includes('invalid')) {
+      return {
+        success: false,
+        message: 'This link has already been used or is expired. Please check if your account is already verified.',
+      }
+    }
+
     return {
       success: false,
-      message: errorMessage.includes('invalid') 
-        ? 'This verification link is invalid or has already been used.' 
-        : errorMessage,
+      message: errorMessage || 'An unexpected error occurred during verification.',
     }
   }
 }

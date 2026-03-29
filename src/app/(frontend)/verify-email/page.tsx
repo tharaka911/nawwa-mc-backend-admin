@@ -14,20 +14,27 @@ const VerifyEmailContent = () => {
   const hasCalled = useRef(false)
 
   useEffect(() => {
-    if (hasCalled.current) return
-    hasCalled.current = true
-
-    if (!token) {
-      setStatus('error')
-      setMessage('No verification token found. Please check your email link.')
+    if (hasCalled.current || !token) return
+    
+    // 1. Check if we've already successfully verified this token in this session
+    const sessionKey = `verify_success_${token}`
+    if (typeof window !== 'undefined' && sessionStorage.getItem(sessionKey)) {
+      setStatus('success')
+      setMessage('Your email has been verified successfully!')
       return
     }
+
+    hasCalled.current = true
 
     const verifyToken = async () => {
       try {
         const result = await verifyEmailAction(token as string);
 
         if (result.success) {
+          // 2. Persist success in session to prevent errors on re-mount/double-click
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem(sessionKey, 'true')
+          }
           setStatus('success')
           setMessage(result.message || 'Your email has been verified successfully!')
         } else {

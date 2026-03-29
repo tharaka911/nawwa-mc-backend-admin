@@ -48,25 +48,36 @@ export const Users: CollectionConfig = {
     },
   },
   hooks: {
+    beforeChange: [
+      ({ data, operation }) => {
+        if (operation === 'create') {
+          // 1. Pre-enable API Key and Auto-Verify for instant functionality
+          data.enableAPIKey = true
+          data._verified = true
+        }
+        return data
+      },
+    ],
     afterChange: [
-      async ({ doc, operation }) => {
-        // Trigger Payload's native API key generation logic after user creation
+      async ({ doc, operation, req }) => {
+        // 2. Generate and save the official 24-byte hex API Key via Local API
         if (operation === 'create') {
           try {
-            const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
-            await fetch(`${serverUrl}/api/users/${doc.id}/api-key`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `users API-Key ${process.env.SUPER_ADMIN_API_KEY}`,
+            await req.payload.update({
+              collection: 'users',
+              id: doc.id,
+              data: {
+                apiKey: crypto.randomBytes(24).toString('hex'),
               },
+              // overrideAccess ensures we can update the key even for a new user
+              overrideAccess: true,
             })
-            console.log(`Successfully generated Payload-native API Key for user: ${doc.id}`)
+            console.log(`Successfully generated official API Key via Local API for user: ${doc.id}`)
           } catch (error) {
-            console.error('Failed to auto-generate API key in hook:', error)
+            console.error('Local API key generation failed:', error)
           }
         }
-      }
+      },
     ],
   },
 
