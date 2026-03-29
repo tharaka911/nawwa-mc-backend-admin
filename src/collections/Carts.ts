@@ -24,6 +24,7 @@ export const Carts: CollectionConfig = {
       admin: {
         readOnly: true,
       },
+      required:true,
     },
 
     //need product array with number of products
