@@ -146,5 +146,27 @@ export const Users: CollectionConfig = {
       relationTo: 'media',
       defaultValue: '67c1babd9f41846dd16b48c8',
     },
+    
+    // API Key Fields (Handled by Payload auth, but customized here for security)
+    {
+      name: 'enableAPIKey',
+      type: 'checkbox',
+      label: 'Enable API Key',
+      admin: {
+        position: 'sidebar',
+      },
+    },
+    {
+      name: 'apiKey',
+      type: 'text',
+      label: 'API Key',
+      admin: {
+        position: 'sidebar',
+      },
+      access: {
+        read: isAdminOrSelfFieldLevel,
+        update: isAdminFieldLevel, 
+      },
+    },
   ],
 }
