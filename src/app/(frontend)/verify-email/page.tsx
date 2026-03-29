@@ -20,8 +20,14 @@ const VerifyEmailContent = () => {
 
     const verifyToken = async () => {
       try {
-        const response = await fetch(`/api/users/verify/${token}`, {
-          method: 'GET',
+        const response = await fetch(`/api/users/verify`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            token,
+          }),
         })
 
         if (response.ok) {
