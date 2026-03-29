@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { isAdminOrCustomer } from '../access/isAdminOrCustomer'
+import { isCustomer } from '../access/isCustomer'
 import { isAdmin, isAdminFieldLevel } from '../access/isAdmin'
 import { isOrderRelated } from '../access/isOrderRelated'
 import { v4 as uuidv4 } from 'uuid' // Import UUID library
@@ -11,7 +11,7 @@ export const Orders: CollectionConfig = {
     hidden: ({ user }) => !user?.roles?.includes('admin'),
   },
   access: {
-    create: isAdminOrCustomer,
+    create: isCustomer,
     read: isOrderRelated,
     update: isOrderRelated,
     delete: isAdmin,

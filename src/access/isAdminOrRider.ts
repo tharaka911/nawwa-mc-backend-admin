@@ -1,23 +1,33 @@
-import { Access } from 'payload'
+import { Access, Where } from 'payload'
 
 export const isAdminOrRider: Access = ({ req: { user } }) => {
   // Need to be logged in
   if (!user) return false
 
-  // If user has role of 'admin'
+  // Admins have full access
   if (user.roles?.includes('admin')) {
     return true
   }
 
-  // If user has role of 'rider'
-  if (user.roles?.includes('rider')) {
-    return {
-      riderEmail: {
-        equals: user.email,
-      },
+  // Allow Riders to see their assigned deliveries AND 
+  // Allow Customers to see their own deliveries
+  if (user.email) {
+    const constraint: Where = {
+      or: [
+        {
+          riderEmail: {
+            equals: user.email,
+          },
+        },
+        {
+          orderedPersonEmail: {
+            equals: user.email,
+          },
+        },
+      ],
     }
+    return constraint
   }
 
-  // Reject everyone else
   return false
 }

@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { isLoggedIn } from '@/access/isLoggedIn'
+import { isOwner } from '../access/isOwner'
 import { isAdmin } from '../access/isAdmin'
 
 export const Notifications: CollectionConfig = {
@@ -8,13 +8,12 @@ export const Notifications: CollectionConfig = {
     useAsTitle: 'messageTitle',
     hidden: ({ user }) => !user?.roles?.includes('admin'),
   },
-   access: {
-      //amyone can create an account
-      create: isAdmin,
-      read: isLoggedIn,
-      update: isAdmin,
-      delete: isAdmin,
-    },
+  access: {
+    create: isAdmin,
+    read: isOwner,
+    update: isAdmin,
+    delete: isAdmin,
+  },
   fields: [
     //email
     {
