@@ -1,4 +1,6 @@
 import type { CollectionConfig } from 'payload'
+import { isAdminOrMediaCreatedUser } from '../access/isAdminOrMediaCreatedUser'
+import { isAdminOrCustomer } from '../access/isAdminOrCustomer'
 import { isOwner } from '../access/isOwner'
 import { isAdmin } from '../access/isAdmin'
 
@@ -9,10 +11,12 @@ export const Carts: CollectionConfig = {
     hidden: ({ user }) => !user?.roles?.includes('admin'),
   },
   access: {
+    
     create: () => true,
-    read: isOwner,
-    update: isOwner,
-    delete: isAdmin,
+    read: isOwner,    // Use isOwner here!
+    update: isOwner,  // Use isOwner here!
+    delete: isAdmin, 
+
   },
 
   fields: [
