@@ -1,13 +1,20 @@
 import { Access } from 'payload'
 
+/**
+ * Access rule for collections that track ownership via the 'useremail' field (e.g., Carts, Orders).
+ * 
+ * - Admins: Full access (return true)
+ * - Users: Access to documents where useremail matches their own (return query)
+ * - Others: Denied (return false)
+ */
 export const isOwner: Access = ({ req: { user }, id }) => {
   // 1. Admins have full access
   if (user?.roles?.includes('admin')) return true
 
-  // 2. Allow access to specific documents (supports fetching by ID)
+  // 2. Allow access if a specific document ID is requested (e.g., Guest lookup)
   // if (id) return true
 
-  // 3. For logged-in users, strictly enforce their email filter
+  // 3. For list/query operations, only show documents owned by the logged-in user
   if (user?.email) {
     return {
       useremail: {
@@ -16,6 +23,6 @@ export const isOwner: Access = ({ req: { user }, id }) => {
     }
   }
 
-  // 4. Deny access for everyone else (guests)
+  // 4. Deny access for everyone else
   return false
 }

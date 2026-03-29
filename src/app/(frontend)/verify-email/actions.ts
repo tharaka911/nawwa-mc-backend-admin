@@ -14,24 +14,25 @@ export const verifyEmailAction = async (token: string) => {
   try {
     const payload = await getPayload({ config })
 
-    const result = await payload.verifyEmail({
+    // payload.verifyEmail returns the user object if successful, or throws if not
+    const user = await payload.verifyEmail({
       collection: 'users',
       token,
     })
 
-    if (result) {
+    if (user) {
       return {
         success: true,
-        message: 'Email verified successfully!',
+        message: 'Email verified successfully! You can now use your account.',
       }
     }
 
     return {
       success: false,
-      message: 'Verification failed. The token may be invalid or expired.',
+      message: 'Verification failed. The link may be invalid or already used.',
     }
   } catch (err: any) {
-    console.error('Verification Action Error:', err)
+    console.error('Verification Action Error:', err.message)
     
     // Check for specific Payload error messages
     const errorMessage = err.message || 'An error occurred during verification.'

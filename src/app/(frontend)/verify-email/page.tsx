@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState, Suspense } from 'react'
+import React, { useEffect, useState, Suspense, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { verifyEmailAction } from './actions'
 
@@ -11,8 +11,12 @@ const VerifyEmailContent = () => {
   
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [message, setMessage] = useState('Verifying your email address...')
+  const hasCalled = useRef(false)
 
   useEffect(() => {
+    if (hasCalled.current) return
+    hasCalled.current = true
+
     if (!token) {
       setStatus('error')
       setMessage('No verification token found. Please check your email link.')
@@ -21,7 +25,7 @@ const VerifyEmailContent = () => {
 
     const verifyToken = async () => {
       try {
-        const result = await verifyEmailAction(token);
+        const result = await verifyEmailAction(token as string);
 
         if (result.success) {
           setStatus('success')
