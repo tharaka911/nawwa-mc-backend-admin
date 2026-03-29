@@ -9,7 +9,7 @@ export const Carts: CollectionConfig = {
     hidden: ({ user }) => !user?.roles?.includes('admin'),
   },
   access: {
-    create: isCustomer,
+    create: () => true,
     read: isOwner,
     update: isOwner,
     delete: isOwner,

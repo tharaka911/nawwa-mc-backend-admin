@@ -18,6 +18,7 @@ export const isOwner: Access = ({ req: { user } }) => {
   }
 
   // Owners have access based on useremail field matching their own email
+  // This works for users logged in via session or API Key
   if (user.email) {
     return {
       useremail: {

@@ -9,14 +9,11 @@ export const isCustomer: Access = ({ req: { user } }) => {
     return false
   }
 
-  // Admins always have access
-  if (user.roles?.includes('admin')) {
-    return true
-  }
-
-  // Customers are allowed to perform the action (e.g., create a cart)
-  if (user.roles?.includes('customer')) {
-    return true
+  // Check roles (type) - works for both session and API key users
+  if (Array.isArray(user.roles)) {
+    if (user.roles.includes('customer')) {
+      return true
+    }
   }
 
   return false
