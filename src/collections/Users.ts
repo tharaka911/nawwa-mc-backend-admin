@@ -51,15 +51,15 @@ export const Users: CollectionConfig = {
     beforeChange: [
       ({ data, operation }) => {
         if (operation === 'create') {
-          // Automatically enable API Key on creation
+          // 1. Automatically enable API Key on creation
           data.enableAPIKey = true
         }
-        
-        // Ensure apiKey is generated if enabled but missing
+
+        // 3. Use standard UUID format for the API Key (Payload-native format)
         if (data.enableAPIKey && !data.apiKey) {
-          data.apiKey = crypto.randomBytes(24).toString('hex')
+          data.apiKey = crypto.randomUUID()
         }
-        
+
         return data
       },
     ],
