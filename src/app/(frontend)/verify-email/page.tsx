@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
+import { verifyEmailAction } from './actions'
 
 const VerifyEmailContent = () => {
   const searchParams = useSearchParams()
@@ -20,26 +21,18 @@ const VerifyEmailContent = () => {
 
     const verifyToken = async () => {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || window.location.origin;
-        const fetchUrl = `${baseUrl}/api/users/verify?token=${encodeURIComponent(token || '')}`;
-        console.log('Fetching verification URL:', fetchUrl);
+        const result = await verifyEmailAction(token);
 
-        const response = await fetch(fetchUrl, {
-          method: 'GET',
-          credentials: 'include',
-        })
-
-        if (response.ok) {
+        if (result.success) {
           setStatus('success')
-          setMessage('Your email has been verified successfully!')
+          setMessage(result.message || 'Your email has been verified successfully!')
         } else {
-          const data = await response.json()
-          console.error('API Error Response:', data);
+          console.error('Action Error:', result.message);
           setStatus('error')
-          setMessage(data.errors?.[0]?.message || 'Verification failed. The link may have expired.')
+          setMessage(result.message || 'Verification failed. The link may have expired.')
         }
       } catch (err) {
-        console.error('Fetch error:', err);
+        console.error('Fatal Error:', err);
         setStatus('error')
         setMessage('An unexpected error occurred. Please try again later.')
       }
