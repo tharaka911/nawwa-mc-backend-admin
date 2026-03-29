@@ -20,14 +20,11 @@ const VerifyEmailContent = () => {
 
     const verifyToken = async () => {
       try {
-        const response = await fetch(`/api/users/verify`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            token,
-          }),
+        console.log('Verifying token:', token);
+        const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || window.location.origin;
+        const response = await fetch(`${baseUrl}/api/users/verify/${encodeURIComponent(token || '')}`, {
+          method: 'GET',
+          credentials: 'include',
         })
 
         if (response.ok) {
@@ -35,10 +32,12 @@ const VerifyEmailContent = () => {
           setMessage('Your email has been verified successfully!')
         } else {
           const data = await response.json()
+          console.error('Verification error response:', data);
           setStatus('error')
           setMessage(data.errors?.[0]?.message || 'Verification failed. The link may have expired.')
         }
       } catch (err) {
+        console.error('Catch error:', err);
         setStatus('error')
         setMessage('An unexpected error occurred. Please try again later.')
       }
@@ -204,12 +203,6 @@ const VerifyEmailContent = () => {
         </h1>
 
         <p>{message}</p>
-
-        {status === 'success' && (
-          <button className="button" onClick={() => router.push('/admin')}>
-            Go to Admin Panel
-          </button>
-        )}
 
         {status === 'error' && (
           <button className="button secondary" onClick={() => window.location.reload()}>
