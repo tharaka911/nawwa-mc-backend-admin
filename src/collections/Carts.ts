@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { isOwner } from '../access/isOwner'
-import { isCustomer } from '../access/isCustomer'
+import { isAdminOrMediaCreatedUser } from '../access/isAdminOrMediaCreatedUser'
+import { isAdminOrCustomer } from '../access/isAdminOrCustomer'
 
 export const Carts: CollectionConfig = {
   slug: 'carts',
@@ -9,18 +10,10 @@ export const Carts: CollectionConfig = {
     hidden: ({ user }) => !user?.roles?.includes('admin'),
   },
   access: {
-    create: () => true,
-    read: isOwner, // isOwner already handles ID-based guest read
-    update: ({ req: { user }, id }) => {
-       if (user?.roles?.includes('admin')) return true
-       if (user?.email) return { useremail: { equals: user.email } }
-       return false
-    },
-    delete: ({ req: { user }, id }) => {
-       if (user?.roles?.includes('admin')) return true
-       if (user?.email) return { useremail: { equals: user.email } }
-       return false
-    },
+    create: isAdminOrCustomer,
+    read: isAdminOrMediaCreatedUser,
+    update: isAdminOrMediaCreatedUser,
+    delete: isAdminOrMediaCreatedUser,
   },
 
   fields: [
