@@ -12,10 +12,28 @@ export const Users: CollectionConfig = {
     hidden: ({ user }) => !user?.roles?.includes('admin'),
   },
   auth: {
-    // verify: true,
+    verify: {
+      generateEmailHTML: ({ token, user }) => {
+        const url = `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}/verify-email?token=${token}`
+
+        return `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+            <h2 style="color: #333; text-align: center;">Verify Your Account</h2>
+            <p>Hello <strong>${user.name || 'User'}</strong>,</p>
+            <p>Thank you for signing up with Nawwa! Please verify your email address by clicking the button below:</p>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${url}" style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Verify Email Address</a>
+            </div>
+            <p style="font-size: 14px; color: #666;">If you didn't create an account, you can safely ignore this email.</p>
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+            <p style="font-size: 12px; color: #999; text-align: center;">If the button above doesn't work, copy and paste this link into your browser:</p>
+            <p style="font-size: 12px; color: #007bff; text-align: center; word-break: break-all;">${url}</p>
+          </div>
+        `
+      },
+      generateEmailSubject: () => 'Verify your Nawwa account',
+    },
     useAPIKey: true,
-    // Allow users without passwords (for Google OAuth)
-    // disableLocalStrategy: true,
   },
   access: {
     // anyone can create an account 
