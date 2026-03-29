@@ -7,19 +7,20 @@ import { Access } from 'payload'
  * - Users: Access to documents where useremail matches their own (return query)
  * - Others: Denied (return false)
  */
-export const isOwner: Access = ({ req: { user } }) => {
-  if (!user) {
-    return false
-  }
-
-  // Admins have full access
-  if (user.roles?.includes('admin')) {
+export const isOwner: Access = ({ req: { user }, id }) => {
+  // 1. Admins have full access to all documents
+  if (user && Array.isArray(user.roles) && user.roles.includes('admin')) {
     return true
   }
 
-  // Owners have access based on useremail field matching their own email
-  // This works for users logged in via session or API Key
-  if (user.email) {
+  // 2. Allow access if a specific document ID is requested (e.g., Guest Cart lookup)
+  // This allows unauthenticated users to read/update/delete a cart IF they know its ID
+  if (id) {
+    return true
+  }
+
+  // 3. For list/query operations, only show documents owned by the logged-in user
+  if (user && user.email) {
     return {
       useremail: {
         equals: user.email,
@@ -27,5 +28,6 @@ export const isOwner: Access = ({ req: { user } }) => {
     }
   }
 
+  // 4. Deny access for everyone else (e.g., guests trying to list all carts)
   return false
 }
