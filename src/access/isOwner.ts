@@ -8,13 +8,12 @@ import { Access } from 'payload'
  * - Others: Denied (return false)
  */
 export const isOwner: Access = ({ req: { user }, id }) => {
-  // 1. Admins have full access
+  // 1. Admins have full access to all carts
   if (user && Array.isArray(user.roles) && user.roles.includes('admin')) {
     return true
   }
 
   // 2. Allow access if a specific document ID is requested (e.g., Guest Cart lookup)
-  // This allows unauthenticated users to read/update/delete a cart IF they know its ID
   if (id) {
     return true
   }

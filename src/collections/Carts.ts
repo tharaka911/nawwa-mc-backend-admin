@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { isAdminOrSelf } from '../access/isAdminOrSelf'
+import { isOwner } from '../access/isOwner'
 import { isAdmin } from '../access/isAdmin'
 
 export const Carts: CollectionConfig = {
@@ -10,10 +10,9 @@ export const Carts: CollectionConfig = {
   },
   access: {
     create: () => true,
-    read: isAdminOrSelf,
-    update: isAdminOrSelf,
+    read: isOwner,
+    update: isOwner,
     delete: isAdmin,
-
   },
 
   fields: [
