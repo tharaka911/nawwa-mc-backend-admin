@@ -51,9 +51,8 @@ export const Users: CollectionConfig = {
     beforeChange: [
       ({ data, operation }) => {
         if (operation === 'create') {
-          // 1. Pre-enable API Key and Auto-Verify for instant functionality
+          // 1. Pre-enable API Key for instant functionality
           data.enableAPIKey = true
-          data._verified = true
         }
         return data
       },
