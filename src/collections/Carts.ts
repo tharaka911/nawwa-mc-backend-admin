@@ -10,7 +10,7 @@ export const Carts: CollectionConfig = {
     hidden: ({ user }) => !user?.roles?.includes('admin'),
   },
   access: {
-    create: isAdminOrCustomer,
+    create: () => true,
     read: isAdminOrMediaCreatedUser,
     update: isAdminOrMediaCreatedUser,
     delete: isAdminOrMediaCreatedUser,
