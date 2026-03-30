@@ -79,6 +79,11 @@ export const Deliveries: CollectionConfig = {
             update: isAdminFieldLevel,
           },
         },
+        {
+          name: 'image',
+          type: 'upload',
+          relationTo: 'media',
+        },
       ],
     },
     {

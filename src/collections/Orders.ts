@@ -77,6 +77,11 @@ export const Orders: CollectionConfig = {
           type: 'number',
           required: true,
         },
+        {
+          name: 'image',
+          type: 'upload',
+          relationTo: 'media',
+        },
       ],
     },
 
@@ -148,6 +153,7 @@ export const Orders: CollectionConfig = {
 
             if (product) {
               totalPrice += product.price * item.quantity
+              item.image = typeof product.image === 'object' ? product.image.id : product.image
             }
           }
 

@@ -42,6 +42,11 @@ export const Carts: CollectionConfig = {
           type: 'number',
           required: true,
         },
+        {
+          name: 'image',
+          type: 'upload',
+          relationTo: 'media',
+        },
       ],
     },
 
@@ -91,6 +96,7 @@ export const Carts: CollectionConfig = {
 
             if (product) {
               totalPrice += product.price * item.quantity
+              item.image = typeof product.image === 'object' ? product.image.id : product.image
             }
           }
 
