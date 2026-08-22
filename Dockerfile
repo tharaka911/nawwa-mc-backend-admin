@@ -10,7 +10,7 @@ WORKDIR /app
 
 # Install pnpm and dependencies
 COPY package.json pnpm-lock.yaml* ./
-RUN npm install -g pnpm && pnpm i --frozen-lockfile
+RUN npm install -g pnpm@10 && pnpm i --frozen-lockfile
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -21,7 +21,7 @@ COPY . .
 # Disable telemetry
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN npm install -g pnpm && pnpm run generate:importmap && pnpm run build
+RUN npm install -g pnpm@10 && pnpm run generate:importmap && pnpm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
